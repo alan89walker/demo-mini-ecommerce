@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Login</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+    :root{
+        --bg:#f4f7fb;
+        --card:#ffffff;
+        --accent:#2b6ef6;
+        --muted:#6b7280;
+        --radius:12px;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;background:
+        radial-gradient(1200px 600px at 10% 10%, rgba(255,255,255,0.03), transparent 10%),
+        radial-gradient(1000px 500px at 90% 90%, rgba(255,255,255,0.02), transparent 10%),
+        linear-gradient(135deg,#0f1724 0%, #0b1a2b 50%, #05202e 100%);color:#e6eef6}
+    .card{width:100%;max-width:460px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);border-radius:var(--radius);padding:32px;box-shadow:0 12px 40px rgba(0,0,0,0.35)}
+    h2{
+        margin:0 0 8px 0;
+        font-size:1.5rem;
+        font-weight:600;
+        letter-spacing:-0.2px;
+    }
+    p.lead{
+        margin:0 0 20px;
+        color:var(--muted);
+        font-size:0.95rem;
+    }
+    label{
+        display:block;
+        font-size:0.85rem;
+        margin-bottom:8px;
+        color:var(--muted);
+    }
+    .field{
+        margin-bottom:16px;
+    }
+    input[type="text"],input[type="password"]{width:100%;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.04);color:#e6eef6;font-size:1rem;outline:none;transition:box-shadow .15s, border-color .15s}
+    input:focus{border-color:#1f7aeb;box-shadow:0 6px 18px rgba(31,122,235,0.25)}
+    .btn{width:100%;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 16px;border-radius:10px;border:none;background:linear-gradient(90deg,#1f7aeb,#1760e6);color:#fff;font-weight:700;cursor:pointer;font-size:1rem}
+    .btn:active{transform:translateY(1px)}
+    .muted-link{
+        display:block;
+        text-align:center;
+        margin-top:14px;
+        color:var(--muted);
+        font-size:0.9rem;
+    }
+    @media (max-width:420px){
+        .card{padding:20px; margin:16px}
+    }
+</style>
+</head>
+<body>
+    <script src="header.js"></script>
+    <div id="site-header"></div>
+    <script>renderHeader('site-header');</script>
+    <main class="card" role="main" aria-labelledby="login-heading">
+        <h2 id="login-heading">Welcome back</h2>
+        <p class="lead">Sign in to your account</p>
+
+        <div class="field">
+            <label for="username">Username</label>
+            <input type="text" id="username" placeholder="your username" required autocomplete="username" />
+        </div>
+
+        <div class="field">
+            <label for="password">Password</label>
+            <div style="display:flex;gap:8px">
+                <input type="password" id="password" placeholder="••••••••" required autocomplete="current-password" style="flex:1" />
+                <button type="button" class="btn" style="width:auto;padding:8px 12px" id="togglePwd">Show</button>
+            </div>
+        </div>
+
+        <button id="loginBtn" type="button" class="btn">Login</button>
+        <a class="muted-link" href="#">Forgot password?</a>
+        <hr style="margin:18px 0;border:none;border-top:1px solid #e6e9ef">
+        <h2 style="font-size:1.2rem">Register</h2>
+        <div class="field">
+            <label for="reg_username">Username</label>
+            <input type="text" id="reg_username" placeholder="choose a username" required />
+        </div>
+        <div class="field">
+            <label for="reg_password">Password</label>
+            <input type="password" id="reg_password" placeholder="••••••••" required />
+        </div>
+        <button id="registerBtn" type="button" class="btn">Register</button>
+    </main>
+
+<script>
+document.getElementById('loginBtn').addEventListener('click', login);
+document.getElementById('registerBtn').addEventListener('click', registerUser);
+document.getElementById('togglePwd').addEventListener('click', () => {
+    const p = document.getElementById('password');
+    if (p.type === 'password') { p.type = 'text'; document.getElementById('togglePwd').textContent = 'Hide'; }
+    else { p.type = 'password'; document.getElementById('togglePwd').textContent = 'Show'; }
+});
+
+function login(){
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+    const formData = new FormData();
+    formData.append('username', username);
+    formData.append('password', password);
+    fetch('../backend/login.php', { method: 'POST', body: formData })
+    .then(res => res.text())
+    .then(text => {
+        let data;
+        try {
+            data = JSON.parse(text);
+        } catch (e) {
+            alert('Server error while logging in:\\n' + text);
+            return;
+        }
+        if (data && data.status === 'success') {
+            if (data.role === 'admin') {
+                window.location.href = '../backend/admin.php';
+            } else {
+                window.location.href = 'products.html';
+            }
+        } else {
+            alert('Invalid login');
+        }
+    })
+    .catch(err => alert('Network error: ' + err));
+}
+
+function registerUser(){
+    const username = document.getElementById('reg_username').value;
+    const password = document.getElementById('reg_password').value;
+    const formData = new FormData();
+    formData.append('username', username);
+    formData.append('password', password);
+    fetch('../backend/register.php', { method: 'POST', body: formData })
+    .then(res => res.text())
+    .then(text => {
+        let data;
+        try {
+            data = JSON.parse(text);
+        } catch (e) {
+            alert('Server error while registering:\\n' + text);
+            return;
+        }
+        if (data && data.status === 'success') {
+            alert('Registered successfully. You can login now.');
+        } else if (data && data.message === 'exists') {
+            alert('Username already exists.');
+        } else {
+            alert('Registration failed.');
+        }
+    })
+    .catch(err => alert('Network error: ' + err));
+}
+</script>
+</body>
+</html>

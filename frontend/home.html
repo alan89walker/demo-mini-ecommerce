@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - Demo Mini Ecommerce</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;background:
+            radial-gradient(1200px 600px at 10% 10%, rgba(255,255,255,0.03), transparent 10%),
+            radial-gradient(1000px 500px at 90% 90%, rgba(255,255,255,0.02), transparent 10%),
+            linear-gradient(135deg,#0f1724 0%, #0b1a2b 50%, #05202e 100%);color:#e6eef6}
+        .container{max-width:1100px;margin:0 auto;padding:20px}
+        .header-inner{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:16px;padding:18px 0}
+        .brand{justify-self:end;font-weight:700;letter-spacing:.6px;font-size:1rem;text-transform:uppercase;color:#f8fbff;text-shadow:0 2px 18px rgba(0,0,0,.5)}
+        .nav a{color:#cfe7ff;text-decoration:none;margin-right:14px}
+        .hero{padding:40px 0;text-align:center}
+        .hero h1{font-size:2.6rem;margin:0 0 10px;color:#fff;text-shadow:0 6px 30px rgba(3,7,18,.6)}
+        .hero p{color:rgba(230,238,246,.8);margin:0 0 22px}
+        .cta{display:inline-block;background:#1f7aeb;color:#fff;padding:12px 16px;border-radius:12px;text-decoration:none;font-weight:700}
+        .grid{margin-top:28px;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:18px}
+        .card{background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.04);padding:12px;border-radius:12px;box-shadow:0 6px 24px rgba(2,8,15,.45);display:flex;flex-direction:column;gap:8px}
+        .thumb img{width:100%;height:160px;object-fit:cover;border-radius:8px}
+        .pname{margin:4px 0;font-weight:600}
+        .pprice{color:#9ef0d1;font-weight:700;margin:4px 0}
+        .btn{padding:8px 12px;border-radius:10px;border:none;cursor:pointer;background:#22c55e;color:#032e1f;font-weight:700}
+        .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:28px;background:rgba(0,0,0,.7);color:#fff;padding:10px 16px;border-radius:10px;opacity:0;pointer-events:none;transition:opacity .18s}
+        .toast.show{opacity:1;pointer-events:auto}
+    </style>
+</head>
+<body>
+    <script src="header.js"></script>
+    <div id="site-header"></div>
+    <script>renderHeader('site-header');</script>
+    <main class="container">
+        <section class="hero">
+            <h1>Discover amazing products</h1>
+            <p>Curated selection with great prices</p>
+            <a class="cta" href="products.html">Shop Now</a>
+        </section>
+        <section>
+            <h2 style="margin:0 0 10px">Featured</h2>
+            <div id="featured" class="grid"></div>
+        </section>
+    </main>
+    <div id="toast" class="toast"></div>
+    <script>
+        function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1600)}
+        function addToCart(p){let cart=JSON.parse(localStorage.getItem('cart'))||[];const i=cart.findIndex(it=>String(it.id)===String(p.id));if(i>=0){cart[i].qty=(cart[i].qty||1)+1}else{cart.push({id:p.id,name:p.name,price:Number(p.price),qty:1})}localStorage.setItem('cart',JSON.stringify(cart));showToast('Added to cart')}
+        fetch('../backend/getProducts.php').then(r=>r.json()).then(d=>{const list=(Array.isArray(d)?d:[]).slice(0,4);document.getElementById('featured').innerHTML=list.map(p=>`<article class="card"><div class="thumb"><img src="${p.image}" alt="${p.name}" loading="lazy"></div><h3 class="pname">${p.name}</h3><p class="pprice">₹${Number(p.price).toFixed(2)}</p><button class="btn" onclick='addToCart(${JSON.stringify({id:""+(p.id),name:p.name,price:Number(p.price)})})'>Add to Cart</button></article>`).join('')}).catch(()=>{document.getElementById('featured').innerHTML='<div>Failed to load</div>'})
+    </script>
+</body>
+</html>
