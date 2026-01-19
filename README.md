@@ -14,12 +14,12 @@ This project includes both **frontend** and **backend** folders, combining core 
 
 ## 📁 Folder Structure
 
+demo-mini-ecommerce/
 ├── .vscode/
 ├── backend/
 ├── frontend/
 ├── images/
 └── README.md
-
 
 - **frontend/** — Contains the main HTML, CSS, and JS for the shopping UI  
 - **backend/** — Placeholder for backend logic (if you expand later)  
